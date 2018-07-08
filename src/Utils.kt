@@ -8,7 +8,6 @@ import com.nyxcode.blinded.backend.game.Player
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.File
-import java.time.LocalDateTime
 import java.util.*
 import java.util.concurrent.ThreadLocalRandom
 import kotlin.reflect.KProperty0
@@ -29,8 +28,6 @@ fun randomString(len: Int): String = StringBuilder().apply {
 
 inline fun <reified O> SocketIOServer.addEventListener(eventName: String, listener: DataListener<O>) =
         addEventListener(eventName, O::class.java, listener)
-
-fun now(): LocalDateTime = LocalDateTime.now()
 
 fun SocketIOServer.defaultNamespace(): SocketIONamespace = this.getNamespace(Namespace.DEFAULT_NAME)
 

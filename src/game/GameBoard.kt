@@ -32,7 +32,7 @@ val GameBoard.winner: Player?
 
 private fun eqNotNull(p1: Player?, p2: Player?, p3: Player?) = p1 != null && p1 == p2 && p2 == p3
 
-fun newEmptyGameboard(): GameBoard = arrayOf(
+fun newBoard(): GameBoard = arrayOf(
         Array<Player?>(3) { null },
         Array<Player?>(3) { null },
         Array<Player?>(3) { null })

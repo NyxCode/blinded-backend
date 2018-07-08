@@ -10,23 +10,17 @@ data class Config(val hostname: String = "localhost",
                   val port: Int = 9999,
                   val gameKeyLen: Int = 4,
                   val playerKeyLen: Int = 128,
-                  val removeOldGamesCheckInterval: TimeSpan = TimeSpan(10, MINUTES),
-                  val removeOldGamesThreshold: TimeSpan = TimeSpan(10, MINUTES)) {
+                  val oldGamesCheckInterval: TimeSpan = TimeSpan(10, MINUTES),
+                  val oldGamesThreshold: TimeSpan = TimeSpan(10, MINUTES)) {
 
-    data class TimeSpan(val amount: Long, val unit: ChronoUnit) {
-        constructor(string: String) : this(string.split(" ")[0].toLong(), ChronoUnit.valueOf(string.split(" ")[1]))
-
-        fun toDuration(): Duration = Duration.of(amount, unit)
-        override fun toString() = "$amount ${unit.toString().toUpperCase()}"
-    }
 
     constructor(props: Properties) : this(
             hostname = props.getProperty(Config::hostname.name),
             port = props.getProperty(Config::port.name).toInt(),
             gameKeyLen = props.getProperty(Config::gameKeyLen.name).toInt(),
             playerKeyLen = props.getProperty(Config::playerKeyLen.name).toInt(),
-            removeOldGamesCheckInterval = TimeSpan(props.getProperty(Config::removeOldGamesCheckInterval.name)),
-            removeOldGamesThreshold = TimeSpan(props.getProperty(Config::removeOldGamesThreshold.name)))
+            oldGamesCheckInterval = TimeSpan.fromString(props.getProperty(Config::oldGamesCheckInterval.name)),
+            oldGamesThreshold = TimeSpan.fromString(props.getProperty(Config::oldGamesThreshold.name)))
 
     init {
         require(hostname.isNotEmpty())
@@ -44,5 +38,20 @@ data class Config(val hostname: String = "localhost",
     }
 
     fun toProperties() = createProperties(::hostname, ::port, ::gameKeyLen, ::playerKeyLen,
-            ::removeOldGamesCheckInterval, ::removeOldGamesThreshold)
+            ::oldGamesCheckInterval, ::oldGamesThreshold)
+}
+
+data class TimeSpan(val amount: Long, val unit: ChronoUnit) {
+
+    companion object {
+        fun fromString(str: String): TimeSpan {
+            val splitted = str.split(' ')
+            val amount = splitted[0].toLong()
+            val unit = splitted[1].toUpperCase()
+            return TimeSpan(amount, ChronoUnit.valueOf(unit))
+        }
+    }
+
+    fun toDuration(): Duration = Duration.of(amount, unit)
+    override fun toString() = "$amount ${unit.toString().toUpperCase()}"
 }

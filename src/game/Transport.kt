@@ -10,7 +10,7 @@ import com.fasterxml.jackson.annotation.JsonProperty
  * If the operation succeeds, the server will respond with the [GameInfo] of the created game.
  * If not, an [Error] will be sent back.
  */
-class CreateGame constructor() {
+class CreateGame {
     companion object {
         const val NAME = "create_game"
     }

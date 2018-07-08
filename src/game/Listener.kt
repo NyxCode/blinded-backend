@@ -9,10 +9,8 @@ import com.nyxcode.blinded.backend.game.*
 import java.util.*
 import kotlin.concurrent.schedule
 
-class CreateGameListener(private val games: Games,
-                         private val config: Config) : DataListener<CreateGame> {
+class CreateGameListener(private val games: Games, private val config: Config) : DataListener<CreateGame> {
     override fun onData(client: SocketIOClient, data: CreateGame, req: AckRequest) {
-        LOG.info("Rec: CreateGame")
         val player = randomString(config.playerKeyLen)
         val game = GameInfo(id = newGameID(config), player1 = player)
         games += game
@@ -25,7 +23,6 @@ class JoinGameListener(private val games: Games,
                        private val server: SocketIOServer,
                        private val config: Config) : DataListener<JoinGame> {
     override fun onData(client: SocketIOClient, data: JoinGame, req: AckRequest) {
-        LOG.info("Rec: JoinGame")
         val game = games[data.id]?.info
         if (game == null) {
             req.sendAckData(Error("We couldn't not find the requested game"))
@@ -35,7 +32,7 @@ class JoinGameListener(private val games: Games,
         when {
             !game.joinable -> req.sendAckData(Error("You can't join this game right now"))
             else -> {
-                val player2 = randomString(config.playerKeyLen)
+                val player2 = newPlayer(config)
                 game.player2 = player2
                 server.defaultNamespace()
                         .getRoomOperations(game.id)
@@ -113,8 +110,7 @@ class DoTurnListener(private val games: Games, private val server: SocketIOServe
 
     private fun doBotTurn(playerClient: SocketIOClient, game: Game) {
         check(game.info.player2 == Bot.ID)
-        val bot = Bot(Bot.ID, game.info.player1)
-        val move = bot.findBestMove(game.data.board)
+        val move = Bot(game).findBestMove()
         game.data.board[move.x][move.y] = Bot.ID
         game.info.nextTurn = game.info.player1
         game.updateState()
@@ -139,9 +135,7 @@ class RequestBotListener(private val games: Games) : DataListener<RequestBot> {
             return
         }
 
-        val botID = Bot.ID
-        game.info.player2 = botID
-        ack.sendAckData(PlayerJoined(botID))
-        Bot(botID, game.info.player1)
+        game.info.player2 = Bot.ID
+        ack.sendAckData(PlayerJoined(Bot.ID))
     }
 }

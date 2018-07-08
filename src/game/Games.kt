@@ -9,14 +9,13 @@ import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.concurrent.schedule
 
-class Games(config: Config,
-            private val server: SocketIOServer) {
+class Games(config: Config, private val server: SocketIOServer) {
 
     private val games = ConcurrentHashMap<String, Game>()
 
     init {
-        val interval = config.removeOldGamesCheckInterval.toDuration().toMillis()
-        val threshold = config.removeOldGamesThreshold.toDuration()
+        val interval = config.oldGamesCheckInterval.toDuration().toMillis()
+        val threshold = config.oldGamesThreshold.toDuration()
         Timer().schedule(interval, interval) { cleanup(threshold) }
     }
 
@@ -43,7 +42,6 @@ class Games(config: Config,
     operator fun minusAssign(game: Game) {
         games.remove(game.info.id)
     }
-
 
     operator fun plusAssign(info: GameInfo) {
         assert(!games.containsKey(info.id))
