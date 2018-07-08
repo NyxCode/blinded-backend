@@ -2,7 +2,6 @@
 - support multiple lives
 - add instant replay button after multiplayer game
 - add bot difficulty
-- remove unnecessary GameData class
 - add server controlled cell view duration
 - add stats page
 - simplify listener

@@ -45,7 +45,7 @@ class Games(config: Config, private val server: SocketIOServer) {
 
     operator fun plusAssign(info: GameInfo) {
         assert(!games.containsKey(info.id))
-        val game = Game(info = info, data = GameData())
+        val game = Game(info)
         games[info.id] = game
     }
 }

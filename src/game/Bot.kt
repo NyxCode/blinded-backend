@@ -14,7 +14,7 @@ class Bot(game: Game) {
 
     private val player = game.info.player2
     private val opponent = game.info.player1
-    private val board = game.data.board
+    private val board = game.board
 
     companion object {
         const val ID = "AN-INTELLIGENT-BOT"

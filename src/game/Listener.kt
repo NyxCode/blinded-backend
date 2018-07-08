@@ -12,10 +12,10 @@ import kotlin.concurrent.schedule
 class CreateGameListener(private val games: Games, private val config: Config) : DataListener<CreateGame> {
     override fun onData(client: SocketIOClient, data: CreateGame, req: AckRequest) {
         val player = randomString(config.playerKeyLen)
-        val game = GameInfo(id = newGameID(config), player1 = player)
-        games += game
-        client.joinRoom(game.id)
-        req.sendAckData(game)
+        val gameInfo = GameInfo(id = newGameID(config), player1 = player)
+        games += gameInfo
+        client.joinRoom(gameInfo.id)
+        req.sendAckData(gameInfo)
     }
 }
 
@@ -23,25 +23,23 @@ class JoinGameListener(private val games: Games,
                        private val server: SocketIOServer,
                        private val config: Config) : DataListener<JoinGame> {
     override fun onData(client: SocketIOClient, data: JoinGame, req: AckRequest) {
-        val game = games[data.id]?.info
-        if (game == null) {
-            req.sendAckData(Error("We couldn't not find the requested game"))
+        val gameInfo = games[data.id]?.info ?: run {
+            req.sendAckData(Error.GAME_NOT_FOUND)
             return
         }
 
         when {
-            !game.joinable -> req.sendAckData(Error("You can't join this game right now"))
+            !gameInfo.joinable -> req.sendAckData(Error("You can't join this game right now"))
             else -> {
                 val player2 = newPlayer(config)
-                game.player2 = player2
+                gameInfo.player2 = player2
                 server.defaultNamespace()
-                        .getRoomOperations(game.id)
+                        .getRoomOperations(gameInfo.id)
                         .clients
                         .first()
                         .sendEvent(PlayerJoined.NAME, PlayerJoined(player2))
-                client.joinRoom(game.id)
-                req.sendAckData(game)
-
+                client.joinRoom(gameInfo.id)
+                req.sendAckData(gameInfo)
             }
         }
     }
@@ -82,7 +80,7 @@ class DoTurnListener(private val games: Games, private val server: SocketIOServe
                 req.sendAckData(Error("Field coordinates out of range!"))
 
         // When the field is already full
-            game.data.board[data.x][data.y] != null -> {
+            game.board[data.x][data.y] != null -> {
                 game.info.completed = true
                 game.info.winner = otherPlayer
                 client.sendEvent(Disqualified.NAME, Disqualified("Whoops, you are disqualified", game))
@@ -90,7 +88,7 @@ class DoTurnListener(private val games: Games, private val server: SocketIOServe
             }
 
             else -> {
-                game.data.board[data.x][data.y] = player
+                game.board[data.x][data.y] = player
                 game.info.nextTurn = otherPlayer
                 req.sendAckData(game.info)
 
@@ -111,7 +109,7 @@ class DoTurnListener(private val games: Games, private val server: SocketIOServe
     private fun doBotTurn(playerClient: SocketIOClient, game: Game) {
         check(game.info.player2 == Bot.ID)
         val move = Bot(game).findBestMove()
-        game.data.board[move.x][move.y] = Bot.ID
+        game.board[move.x][move.y] = Bot.ID
         game.info.nextTurn = game.info.player1
         game.updateState()
 
@@ -125,7 +123,6 @@ class DoTurnListener(private val games: Games, private val server: SocketIOServe
 
 class RequestBotListener(private val games: Games) : DataListener<RequestBot> {
     override fun onData(client: SocketIOClient, data: RequestBot, ack: AckRequest) {
-        LOG.info("req bot")
         val game = games[data.id] ?: run {
             ack.sendAckData(Error.GAME_NOT_FOUND)
             return
