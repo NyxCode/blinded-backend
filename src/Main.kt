@@ -7,34 +7,27 @@ import game.CreateGameListener
 import game.DoTurnListener
 import game.JoinGameListener
 import game.RequestBotListener
-import java.io.File
-import java.time.Duration
-import java.util.*
 
 fun main(args: Array<String>) {
-    val props = Properties()
-    File("config.properties").reader().use {
-        props.load(it)
-    }
+    val config = Config.loadOrCreate("config.properties").also(::println)
+    val server = createSocketIOServer(config)
+    val games = Games(config, server)
 
-    val config = Configuration()
-    config.hostname = props.getProperty("hostname")
-    config.port = props.getProperty("port").toInt()
-
-    val server = SocketIOServer(config)
-    val games = Games(
-            cleanupInterval = Duration.ofMinutes(10),
-            cleanupThreshold = Duration.ofMinutes(10),
-            server = server)
-
-    server.addEventListener(CreateGame.NAME, CreateGameListener(games))
-
-    server.addEventListener(JoinGame.NAME, JoinGameListener(games, server))
-
-    server.addEventListener(RequestBot.NAME, RequestBotListener(games))
-
-    server.addEventListener(DoTurn.NAME, DoTurnListener(games, server))
-
+    server.registerListener(games, config)
     server.start()
 }
 
+fun createSocketIOServer(config: Config): SocketIOServer {
+    val configuration = Configuration().apply {
+        hostname = config.hostname
+        port = config.port
+    }
+    return SocketIOServer(configuration)
+}
+
+fun SocketIOServer.registerListener(games: Games, config: Config) {
+    addEventListener(CreateGame.NAME, CreateGameListener(games, config))
+    addEventListener(JoinGame.NAME, JoinGameListener(games, this, config))
+    addEventListener(RequestBot.NAME, RequestBotListener(games))
+    addEventListener(DoTurn.NAME, DoTurnListener(games, this))
+}

@@ -4,24 +4,26 @@ import com.corundumstudio.socketio.AckRequest
 import com.corundumstudio.socketio.SocketIOClient
 import com.corundumstudio.socketio.SocketIOServer
 import com.corundumstudio.socketio.listener.DataListener
-import com.nyxcode.blinded.backend.LOG
-import com.nyxcode.blinded.backend.defaultNamespace
+import com.nyxcode.blinded.backend.*
 import com.nyxcode.blinded.backend.game.*
 import java.util.*
 import kotlin.concurrent.schedule
 
-class CreateGameListener(private val games: Games) : DataListener<CreateGame> {
+class CreateGameListener(private val games: Games,
+                         private val config: Config) : DataListener<CreateGame> {
     override fun onData(client: SocketIOClient, data: CreateGame, req: AckRequest) {
         LOG.info("Rec: CreateGame")
-        val player = newPlayer()
-        val game = GameInfo(player1 = player)
+        val player = randomString(config.playerKeyLen)
+        val game = GameInfo(id = newGameID(config), player1 = player)
         games += game
         client.joinRoom(game.id)
         req.sendAckData(game)
     }
 }
 
-class JoinGameListener(private val games: Games, private val server: SocketIOServer) : DataListener<JoinGame> {
+class JoinGameListener(private val games: Games,
+                       private val server: SocketIOServer,
+                       private val config: Config) : DataListener<JoinGame> {
     override fun onData(client: SocketIOClient, data: JoinGame, req: AckRequest) {
         LOG.info("Rec: JoinGame")
         val game = games[data.id]?.info
@@ -33,7 +35,7 @@ class JoinGameListener(private val games: Games, private val server: SocketIOSer
         when {
             !game.joinable -> req.sendAckData(Error("You can't join this game right now"))
             else -> {
-                val player2 = newPlayer()
+                val player2 = randomString(config.playerKeyLen)
                 game.player2 = player2
                 server.defaultNamespace()
                         .getRoomOperations(game.id)
@@ -98,6 +100,7 @@ class DoTurnListener(private val games: Games, private val server: SocketIOServe
                 game.updateState()
                 if (game.info.completed) {
                     room.sendEvent(GameCompleted.NAME, GameCompleted(game))
+                    games -= game
                 } else {
                     otherClient?.sendEvent(EnemyTurn.NAME, EnemyTurn(data.x, data.y))
                     if (otherPlayer == Bot.ID) {

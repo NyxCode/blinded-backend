@@ -2,11 +2,9 @@ package com.nyxcode.blinded.backend.game
 
 import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.nyxcode.blinded.backend.KEY_LEN
-import com.nyxcode.blinded.backend.randomString
 import java.time.LocalDateTime
 
-data class GameInfo @JsonCreator constructor(@JsonProperty("id") val id: String = randomString(KEY_LEN),
+data class GameInfo @JsonCreator constructor(@JsonProperty("id") val id: String,
                                              @JsonProperty("createdAt") val createdAt: LocalDateTime = LocalDateTime.now(),
                                              @JsonProperty("player1") val player1: Player,
                                              @JsonProperty("player2") var player2: Player? = null,

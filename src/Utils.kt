@@ -4,16 +4,18 @@ import com.corundumstudio.socketio.SocketIONamespace
 import com.corundumstudio.socketio.SocketIOServer
 import com.corundumstudio.socketio.listener.DataListener
 import com.corundumstudio.socketio.namespace.Namespace
+import com.nyxcode.blinded.backend.game.Player
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import java.io.File
 import java.time.LocalDateTime
+import java.util.*
 import java.util.concurrent.ThreadLocalRandom
+import kotlin.reflect.KProperty0
 
 val LOG: Logger = LoggerFactory.getLogger("default")
 
 private val CHARS = ('0'..'9') + ('a'..'z') + ('A'..'Z')
-
-const val KEY_LEN = 4
 
 fun randomString(len: Int): String = StringBuilder().apply {
     val random = ThreadLocalRandom.current()
@@ -31,3 +33,19 @@ inline fun <reified O> SocketIOServer.addEventListener(eventName: String, listen
 fun now(): LocalDateTime = LocalDateTime.now()
 
 fun SocketIOServer.defaultNamespace(): SocketIONamespace = this.getNamespace(Namespace.DEFAULT_NAME)
+
+fun createProperties(vararg entries: KProperty0<*>) = Properties().apply {
+    for (entry in entries) {
+        val key = entry.name
+        val value = entry.get().toString()
+        setProperty(key, value)
+    }
+}
+
+fun loadProperties(file: File) = Properties().apply { file.reader().use { load(it) } }
+
+fun Properties.store(file: File) = file.writer().use { store(it, "") }
+
+fun newPlayer(config: Config): Player = randomString(config.playerKeyLen)
+
+fun newGameID(config: Config): String = randomString(config.gameKeyLen)

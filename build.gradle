@@ -26,8 +26,10 @@ repositories {
 
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+    compile 'org.jetbrains.kotlin:kotlin-reflect:1.2.51'
     compile 'com.corundumstudio.socketio:netty-socketio:1.7.12'
     compile 'org.slf4j:slf4j-jdk14:1.7.25'
+    
 }
 
 
