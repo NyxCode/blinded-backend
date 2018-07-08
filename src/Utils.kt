@@ -4,11 +4,12 @@ import com.corundumstudio.socketio.SocketIONamespace
 import com.corundumstudio.socketio.SocketIOServer
 import com.corundumstudio.socketio.listener.DataListener
 import com.corundumstudio.socketio.namespace.Namespace
+import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.time.LocalDateTime
 import java.util.concurrent.ThreadLocalRandom
 
-val LOG = LoggerFactory.getLogger("default")
+val LOG: Logger = LoggerFactory.getLogger("default")
 
 private val CHARS = ('0'..'9') + ('a'..'z') + ('A'..'Z')
 
@@ -24,10 +25,8 @@ fun randomString(len: Int): String = StringBuilder().apply {
 }.toString()
 
 
-inline fun <reified O> SocketIOServer.addEventListener(eventName: String,
-                                                       listener: DataListener<O>) =
+inline fun <reified O> SocketIOServer.addEventListener(eventName: String, listener: DataListener<O>) =
         addEventListener(eventName, O::class.java, listener)
-
 
 fun now(): LocalDateTime = LocalDateTime.now()
 
