@@ -52,6 +52,8 @@ sourceSets {
 }
 
 shadowJar {
-    baseName = 'blinded-shadowed'
+    baseName = 'blinded-backend'
+    classifier = null
+    version = null
     configurations = [project.configurations.compile]
 }
