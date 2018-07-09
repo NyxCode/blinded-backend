@@ -96,6 +96,10 @@ data class Error (val description: String) {
     companion object {
         const val NAME = "error"
         val GAME_NOT_FOUND = Error("We couldn't find the requested game!")
+        val CANT_JOIN = Error("You can't join this game right now")
+        val UNEXPECTED = Error("An unexpected error occurred")
+        val NOT_YOUR_TURN = Error("It's not your turn yet!")
+        val WAITING_FOR_PLAYER = Error("We are still waiting for a player to join!")
     }
 
     // Helps identifying an error object in non-types languages like js

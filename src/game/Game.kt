@@ -1,5 +1,6 @@
 package com.nyxcode.blinded.backend.game
 
+import com.corundumstudio.socketio.SocketIOServer
 import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonProperty
 import java.util.*
@@ -38,3 +39,5 @@ data class Game @JsonCreator constructor(
 val Game.id get() = info.id
 
 val Game.age get() = info.age
+
+fun Game.room(server: SocketIOServer) = info.room(server)

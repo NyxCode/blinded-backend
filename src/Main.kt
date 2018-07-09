@@ -4,13 +4,14 @@ import com.corundumstudio.socketio.Configuration
 import com.corundumstudio.socketio.SocketIOServer
 import com.nyxcode.blinded.backend.game.*
 import game.*
+import java.util.*
 
 fun main(args: Array<String>) {
-    val config = Config.loadOrCreate("config.properties")
-            .also { LOG.info("Successfully loaded configuration: {}", it) }
+    val config = Config("blinded.cfg").also(Config::save)
     val server = createSocketIOServer(config)
     val stats = Statistics()
-    val games = Games(config, server, stats)
+    val timer = Timer()
+    val games = Games(config, timer, server, stats)
 
     server.registerListener(games, config, stats)
     server.start()

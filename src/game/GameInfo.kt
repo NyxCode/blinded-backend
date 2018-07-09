@@ -1,5 +1,8 @@
 package com.nyxcode.blinded.backend.game
 
+import com.corundumstudio.socketio.BroadcastOperations
+import com.corundumstudio.socketio.SocketIOServer
+import com.corundumstudio.socketio.namespace.Namespace
 import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.nyxcode.blinded.backend.now
@@ -19,3 +22,6 @@ data class GameInfo @JsonCreator constructor(
 }
 
 val GameInfo.age: Duration get() = Duration.between(createdAt, now())
+
+fun GameInfo.room(server: SocketIOServer): BroadcastOperations =
+        server.getNamespace(Namespace.DEFAULT_NAME).getRoomOperations(id)

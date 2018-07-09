@@ -2,28 +2,17 @@ package com.nyxcode.blinded.backend.game
 
 import com.nyxcode.blinded.backend.allEqual
 
-val EmptyCell: Cell = null
 typealias Cell = Player?
 typealias Column = Array<Cell>
 typealias GameBoard = Array<Column>
 
-inline fun GameBoard.forEachCell(block: (x: Int, y: Int, cell: Cell) -> Unit) {
-    for (x in 0..2)
-        for (y in 0..2)
-            block(x, y, this[x][y])
-}
-
-val GameBoard.full: Boolean
-    get() {
-        var full = true
-        forEachCell { _, _, cell ->
-            if (cell == EmptyCell) {
-                full = false
-                return@forEachCell
-            }
+inline fun GameBoard.forEachCell(block: (x: Int, y: Int, cell: Cell) -> Unit) =
+        forEachIndexed { x, column ->
+            column.forEachIndexed { y, cell -> block(x, y, cell) }
         }
-        return full
-    }
+
+
+val GameBoard.full get() = all { it.all { it != null } }
 
 val GameBoard.winner: Player?
     get() {
@@ -42,7 +31,7 @@ val GameBoard.winner: Player?
         }
     }
 
-fun newBoard() = GameBoard(3) { Column(3) { EmptyCell } }
+fun newBoard() = GameBoard(3) { Column(3) { null } }
 
 
 

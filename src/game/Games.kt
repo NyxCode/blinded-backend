@@ -3,44 +3,40 @@ package com.nyxcode.blinded.backend.game
 import com.corundumstudio.socketio.SocketIOServer
 import com.nyxcode.blinded.backend.Config
 import com.nyxcode.blinded.backend.LOG
-import com.nyxcode.blinded.backend.defaultNamespace
 import java.time.Duration
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.concurrent.schedule
 
-class Games(config: Config,
+class Games(cfg: Config,
+            timer: Timer,
             private val server: SocketIOServer,
             private val statistics: Statistics) {
 
     private val games = ConcurrentHashMap<String, Game>()
 
     init {
-        val interval = config.oldGamesCheckInterval.toDuration()
-        val threshold = config.oldGamesThreshold.toDuration()
-        LOG.info("Deleting games older than $threshold every $interval")
+        val rate = cfg.checkRate
+        val timeout = cfg.timeout
+        LOG.info("Deleting games older than $timeout every $rate")
 
-        val intervalMillis = interval.toMillis()
-        Timer().schedule(intervalMillis, intervalMillis) { cleanup(threshold) }
+        val interval = rate.toMillis()
+        timer.schedule(interval, interval) { cleanup(timeout) }
     }
 
     private fun cleanup(threshold: Duration) {
-        val iterator = games.iterator()
-        var removeCount = 0
-        while (iterator.hasNext()) {
-            val game = iterator.next().value
-            if (game.age >= threshold || game.info.completed) {
-                iterator.remove()
-                removeCount++
+        var removed = 0
 
-                val room = game.info.id
-                for (client in server.defaultNamespace().getRoomOperations(room).clients) {
-                    client.leaveRoom(room)
-                }
+        games.entries.removeIf {
+            if (it.value.age > threshold) {
+                removed++
+                true
+            } else {
+                false
             }
         }
-        if (removeCount > 0)
-            LOG.info("Deleted $removeCount games during last cleanup")
+
+        if (removed > 0) LOG.info("Removed $removed games")
     }
 
     private fun updateStats(newGame: Boolean = false) = with(statistics) {
@@ -49,18 +45,12 @@ class Games(config: Config,
     }
 
     operator fun get(id: String): Game? = games[id]
+
     fun unregister(id: String): Game? = games.remove(id).also { updateStats() }
 
-    fun unregister(game: Game): Game? = unregister(game.id)
-
-    fun registered(id: String): Boolean = games.containsKey(id)
-    fun registered(game: Game): Boolean = registered(game.id)
-
     fun register(game: Game) {
-        check(!registered(game))
+        check(!games.containsKey(game.id))
         games[game.id] = game
         updateStats(newGame = true)
     }
-
-    fun register(gameInfo: GameInfo): Game = Game(gameInfo).also { register(it) }
 }
