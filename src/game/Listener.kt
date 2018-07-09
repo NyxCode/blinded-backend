@@ -137,8 +137,8 @@ class RequestBotListener(private val games: Games) : DataListener<RequestBot> {
     }
 }
 
-class RequestStatisticsListener(val stats: Statistics) : DataListener<RequestBot> {
-    override fun onData(client: SocketIOClient, data: RequestBot, ack: AckRequest) {
+class RequestStatisticsListener(val stats: Statistics) : DataListener<RequestStatistics> {
+    override fun onData(client: SocketIOClient, data: RequestStatistics, ack: AckRequest) {
         ack.sendAckData(stats)
     }
 }
