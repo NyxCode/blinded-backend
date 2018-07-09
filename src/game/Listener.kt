@@ -115,6 +115,7 @@ class DoTurnListener(private val games: Games, private val server: SocketIOServe
 
         if (game.info.completed) {
             playerClient.sendEvent(GameCompleted.NAME, GameCompleted(game))
+            games.unregister(game)
         } else {
             playerClient.sendEvent(EnemyTurn.NAME, EnemyTurn(move.x, move.y))
         }
