@@ -85,6 +85,7 @@ class DoTurnListener(private val games: Games, private val server: SocketIOServe
                 game.info.winner = otherPlayer
                 client.sendEvent(Disqualified.NAME, Disqualified("Whoops, you are disqualified", game))
                 otherClient?.sendEvent(GameCompleted.NAME, GameCompleted(game))
+                games.unregister(game)
             }
 
             else -> {
