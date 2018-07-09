@@ -16,7 +16,12 @@ inline fun GameBoard.forEachCell(block: (x: Int, y: Int, cell: Cell) -> Unit) {
 val GameBoard.full: Boolean
     get() {
         var full = true
-        forEachCell { _, _, cell -> full = cell == EmptyCell }
+        forEachCell { _, _, cell ->
+            if (cell == EmptyCell) {
+                full = false
+                return@forEachCell
+            }
+        }
         return full
     }
 
