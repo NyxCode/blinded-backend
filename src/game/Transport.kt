@@ -112,6 +112,9 @@ data class Error @JsonCreator constructor(@JsonProperty("description") val descr
         const val NAME = "error"
         val GAME_NOT_FOUND = Error("We couldn't find the requested game!")
     }
+
+    // Helps identifying an error object in non-types languages like js
+    val isError = true
 }
 
 /**
