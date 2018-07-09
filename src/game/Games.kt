@@ -43,6 +43,7 @@ class Games(config: Config,
 
     fun unregister(id: String) = games.remove(id).also {
         if (it != null) statistics.runningGames--
+        LOG.info("Unregistered Game: {}", statistics)
     }
 
     fun unregister(game: Game): Game? = unregister(game.id)
@@ -55,6 +56,7 @@ class Games(config: Config,
         games[game.id] = game
         statistics.gamesToday++
         statistics.runningGames++
+        LOG.info("Registered Game: {}", statistics)
     }
 
     fun register(gameInfo: GameInfo): Game = Game(gameInfo).also { register(it) }
