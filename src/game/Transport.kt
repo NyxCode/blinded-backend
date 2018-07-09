@@ -114,6 +114,7 @@ data class Error @JsonCreator constructor(@JsonProperty("description") val descr
     }
 
     // Helps identifying an error object in non-types languages like js
+    @JsonProperty("error")
     val isError = true
 }
 
