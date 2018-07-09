@@ -82,7 +82,7 @@ class DoTurnListener(private val games: Games, private val server: SocketIOServe
             game.board[data.x][data.y] != null -> {
                 game.info.completed = true
                 game.info.winner = otherPlayer
-                client.sendEvent(Disqualified.NAME, Disqualified("Whoops, you are disqualified", game))
+                client.sendEvent(Disqualified.NAME, Disqualified(game))
                 otherClient?.sendEvent(GameCompleted.NAME, GameCompleted(game))
                 games.unregister(game.id)
             }

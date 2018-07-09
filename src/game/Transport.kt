@@ -59,7 +59,7 @@ data class GameCompleted(val game: Game) {
 /**
  * Sent by the server to a client to inform the player that he got disqualified.
  */
-data class Disqualified(val reason: String, val game: Game) {
+data class Disqualified(val game: Game) {
     companion object {
         const val NAME = "disqualified"
     }
