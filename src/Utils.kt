@@ -58,6 +58,7 @@ fun allEqual(vararg args: Any?, mayBeNull: Boolean = true): Boolean {
         true
     } else {
         val reference = args.first()
-        args.none { (it != reference)  && (mayBeNull || it != null) }
+        if (!mayBeNull && reference == null) return false
+        args.none { it != reference }
     }
 }
