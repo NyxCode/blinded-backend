@@ -9,7 +9,9 @@ import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.concurrent.schedule
 
-class Games(config: Config, private val server: SocketIOServer) {
+class Games(config: Config,
+            private val server: SocketIOServer,
+            private val statistics: Statistics) {
 
     private val games = ConcurrentHashMap<String, Game>()
 
@@ -39,13 +41,23 @@ class Games(config: Config, private val server: SocketIOServer) {
 
     operator fun get(id: String): Game? = games[id]
 
-    operator fun minusAssign(game: Game) {
-        games.remove(game.info.id)
+    fun unregister(id: String) = games.remove(id).also {
+        if (it != null) statistics.runningGames--
     }
 
-    operator fun plusAssign(info: GameInfo) {
-        assert(!games.containsKey(info.id))
-        val game = Game(info)
-        games[info.id] = game
+    fun unregister(game: Game): Game? = unregister(game.id)
+
+    fun registered(id: String): Boolean = games.containsKey(id)
+    fun registered(game: Game): Boolean = registered(game.id)
+
+    fun register(game: Game) {
+        check(!registered(game))
+        games[game.id] = game
+        statistics.gamesToday++
+        statistics.runningGames++
     }
+
+    fun register(gameInfo: GameInfo): Game = Game(gameInfo).also { register(it) }
+
+    val size get() = games.size
 }

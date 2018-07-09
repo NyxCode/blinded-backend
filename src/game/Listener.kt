@@ -13,7 +13,7 @@ class CreateGameListener(private val games: Games, private val config: Config) :
     override fun onData(client: SocketIOClient, data: CreateGame, req: AckRequest) {
         val player = randomString(config.playerKeyLen)
         val gameInfo = GameInfo(id = newGameID(config), player1 = player)
-        games += gameInfo
+        games.register(gameInfo)
         client.joinRoom(gameInfo.id)
         req.sendAckData(gameInfo)
     }
@@ -95,7 +95,7 @@ class DoTurnListener(private val games: Games, private val server: SocketIOServe
                 game.updateState()
                 if (game.info.completed) {
                     room.sendEvent(GameCompleted.NAME, GameCompleted(game))
-                    games -= game
+                    games.unregister(game)
                 } else {
                     otherClient?.sendEvent(EnemyTurn.NAME, EnemyTurn(data.x, data.y))
                     if (otherPlayer == Bot.ID) {
@@ -134,5 +134,11 @@ class RequestBotListener(private val games: Games) : DataListener<RequestBot> {
 
         game.info.player2 = Bot.ID
         ack.sendAckData(PlayerJoined(Bot.ID))
+    }
+}
+
+class RequestStatisticsListener(val stats: Statistics) : DataListener<RequestBot> {
+    override fun onData(client: SocketIOClient, data: RequestBot, ack: AckRequest) {
+        ack.sendAckData(stats)
     }
 }

@@ -39,3 +39,5 @@ data class Game @JsonCreator constructor(
         return result
     }
 }
+
+val Game.id get() = info.id

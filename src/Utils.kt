@@ -8,6 +8,8 @@ import com.nyxcode.blinded.backend.game.Player
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.File
+import java.time.LocalDate
+import java.time.LocalDateTime
 import java.util.*
 import java.util.concurrent.ThreadLocalRandom
 import kotlin.reflect.KProperty0
@@ -46,3 +48,7 @@ fun Properties.store(file: File) = file.writer().use { store(it, "") }
 fun newPlayer(config: Config): Player = randomString(config.playerKeyLen)
 
 fun newGameID(config: Config): String = randomString(config.gameKeyLen)
+
+fun now(): LocalDateTime = LocalDateTime.now()
+
+fun today(): LocalDate = LocalDate.now()

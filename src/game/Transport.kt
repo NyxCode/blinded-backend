@@ -113,3 +113,14 @@ data class Error @JsonCreator constructor(@JsonProperty("description") val descr
         val GAME_NOT_FOUND = Error("We couldn't find the requested game!")
     }
 }
+
+/**
+ * Client => Server
+ *
+ * Sent by a client to the server to ask for statistics.
+ */
+class RequestStatistics {
+    companion object {
+        const val NAME = "request-statistics"
+    }
+}
