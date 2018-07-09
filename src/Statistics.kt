@@ -18,4 +18,6 @@ class Statistics {
             gamesToday = 0
         }, delay, 1, TimeUnit.DAYS)
     }
+
+    override fun toString() = "Statistics(gamesToday=$gamesToday, runningGames=$runningGames)"
 }
