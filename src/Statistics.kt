@@ -1,5 +1,6 @@
 package com.nyxcode.blinded.backend.game
 
+import com.nyxcode.blinded.backend.LOG
 import com.nyxcode.blinded.backend.now
 import com.nyxcode.blinded.backend.today
 import java.time.Duration
@@ -15,6 +16,7 @@ class Statistics {
         val delay = Duration.between(now(), midnight).toMillis()
 
         Executors.newScheduledThreadPool(1).scheduleWithFixedDelay({
+            LOG.info("Daily game counter set to 0")
             gamesToday = 0
         }, delay, 1, TimeUnit.DAYS)
     }

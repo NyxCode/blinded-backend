@@ -16,9 +16,12 @@ class Games(config: Config,
     private val games = ConcurrentHashMap<String, Game>()
 
     init {
-        val interval = config.oldGamesCheckInterval.toDuration().toMillis()
+        val interval = config.oldGamesCheckInterval.toDuration()
         val threshold = config.oldGamesThreshold.toDuration()
-        Timer().schedule(interval, interval) { cleanup(threshold) }
+        LOG.info("Deleting games older than $threshold every $interval")
+
+        val intervalMillis = interval.toMillis()
+        Timer().schedule(intervalMillis, intervalMillis) { cleanup(threshold) }
     }
 
     private fun cleanup(threshold: Duration) {
@@ -26,7 +29,7 @@ class Games(config: Config,
         var removeCount = 0
         while (iterator.hasNext()) {
             val game = iterator.next().value
-            if (game isOlderThan threshold || game.info.completed) {
+            if (game.age >= threshold || game.info.completed) {
                 iterator.remove()
                 removeCount++
 
@@ -36,15 +39,17 @@ class Games(config: Config,
                 }
             }
         }
-        LOG.info("Deleted $removeCount games during last cleanup")
+        if (removeCount > 0)
+            LOG.info("Deleted $removeCount games during last cleanup")
+    }
+
+    private fun updateStats(newGame: Boolean = false) = with(statistics) {
+        if (newGame) gamesToday++
+        runningGames = games.size
     }
 
     operator fun get(id: String): Game? = games[id]
-
-    fun unregister(id: String) = games.remove(id).also {
-        if (it != null) statistics.runningGames--
-        LOG.info("Unregistered Game: {}", statistics)
-    }
+    fun unregister(id: String): Game? = games.remove(id).also { updateStats() }
 
     fun unregister(game: Game): Game? = unregister(game.id)
 
@@ -54,12 +59,8 @@ class Games(config: Config,
     fun register(game: Game) {
         check(!registered(game))
         games[game.id] = game
-        statistics.gamesToday++
-        statistics.runningGames++
-        LOG.info("Registered Game: {}", statistics)
+        updateStats(newGame = true)
     }
 
     fun register(gameInfo: GameInfo): Game = Game(gameInfo).also { register(it) }
-
-    val size get() = games.size
 }

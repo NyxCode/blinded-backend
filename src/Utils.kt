@@ -52,3 +52,12 @@ fun newGameID(config: Config): String = randomString(config.gameKeyLen)
 fun now(): LocalDateTime = LocalDateTime.now()
 
 fun today(): LocalDate = LocalDate.now()
+
+fun allEqual(vararg args: Any?, mayBeNull: Boolean = true): Boolean {
+    return if (args.isEmpty()) {
+        true
+    } else {
+        val reference = args.first()
+        args.none { (it != reference)  && (mayBeNull || it != null) }
+    }
+}

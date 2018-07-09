@@ -2,16 +2,11 @@ package com.nyxcode.blinded.backend.game
 
 import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonProperty
-import java.time.Duration
-import java.time.LocalDateTime
 import java.util.*
 
 data class Game @JsonCreator constructor(
         @JsonProperty("info") val info: GameInfo,
         @JsonProperty("board") val board: GameBoard = newBoard()) {
-
-    infix fun isOlderThan(duration: Duration): Boolean =
-            LocalDateTime.now().isAfter(info.createdAt.plus(duration))
 
     fun updateState() {
         val winner = board.winner
@@ -41,3 +36,5 @@ data class Game @JsonCreator constructor(
 }
 
 val Game.id get() = info.id
+
+val Game.age get() = info.age

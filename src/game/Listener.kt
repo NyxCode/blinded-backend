@@ -37,7 +37,7 @@ class JoinGameListener(private val games: Games,
                         .getRoomOperations(gameInfo.id)
                         .clients
                         .first()
-                        .sendEvent(PlayerJoined.NAME, PlayerJoined(player2))
+                        .sendEvent(PlayerJoined.NAME, PlayerJoined(gameInfo.id, player2))
                 client.joinRoom(gameInfo.id)
                 req.sendAckData(gameInfo)
             }
@@ -135,7 +135,7 @@ class RequestBotListener(private val games: Games) : DataListener<RequestBot> {
         }
 
         game.info.player2 = Bot.ID
-        ack.sendAckData(PlayerJoined(Bot.ID))
+        ack.sendAckData(PlayerJoined(game.id, Bot.ID))
     }
 }
 

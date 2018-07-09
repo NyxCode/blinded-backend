@@ -6,7 +6,8 @@ import com.nyxcode.blinded.backend.game.*
 import game.*
 
 fun main(args: Array<String>) {
-    val config = Config.loadOrCreate("config.properties").also(::println)
+    val config = Config.loadOrCreate("config.properties")
+            .also { LOG.info("Successfully loaded configuration: {}", it) }
     val server = createSocketIOServer(config)
     val stats = Statistics()
     val games = Games(config, server, stats)

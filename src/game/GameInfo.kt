@@ -2,6 +2,8 @@ package com.nyxcode.blinded.backend.game
 
 import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonProperty
+import com.nyxcode.blinded.backend.now
+import java.time.Duration
 import java.time.LocalDateTime
 
 data class GameInfo @JsonCreator constructor(
@@ -15,3 +17,5 @@ data class GameInfo @JsonCreator constructor(
 
     val joinable get() = player2 == null && !completed
 }
+
+val GameInfo.age: Duration get() = Duration.between(createdAt, now())
