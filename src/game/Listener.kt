@@ -32,7 +32,7 @@ class JoinGameListener(private val games: Games,
         }
 
         when {
-            info.completed || info.player2 == null -> req.sendAckData(Error.CANT_JOIN)
+            info.completed || info.player2 != null -> req.sendAckData(Error.CANT_JOIN)
             else -> {
                 val player2 = newPlayer(config)
                 info.player2 = player2
