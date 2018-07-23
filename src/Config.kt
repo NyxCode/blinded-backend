@@ -19,16 +19,21 @@ class Config(path: String) {
     }
 
     val hostname: String = get(::hostname) { "localhost" }
-    val port: Int = get(::port) { 9999 }.toInt()
+    val apiPort: Int = get(::apiPort) { 8081 }.toInt()
+    val serverPort: Int = get(::serverPort) { 8080 }.toInt()
     val gameKeyLen: Int = get(::gameKeyLen) { 4 }.toInt()
     val playerKeyLen: Int = get(::playerKeyLen) { 16 }.toInt()
     val timeout: Duration = get(::timeout) { duration(10, MINUTES) }.let(Duration::parse)
     val checkRate: Duration = get(::checkRate) { duration(10, MINUTES) }.let(Duration::parse)
 
+    val frontendDirectory: File = getDirectory(::frontendDirectory) { "../blinded-frontend/dist/" }
+
     fun save() = file.writer().use { properties.store(it, "blinded-backend configuration") }
 
-    private fun get(field: KProperty<*>, def: () -> Any?): String =
+    private inline fun get(field: KProperty<*>, def: () -> Any?): String =
             properties.getProperty(field.name) ?: def().toString().also {
                 properties.setProperty(field.name, it)
             }
+
+    private inline fun getDirectory(field: KProperty<*>, def: () -> Any?) = File(get(field, def))
 }

@@ -5,6 +5,8 @@ import com.corundumstudio.socketio.SocketIOServer
 import com.corundumstudio.socketio.listener.DataListener
 import com.corundumstudio.socketio.namespace.Namespace
 import com.nyxcode.blinded.backend.game.Player
+import io.javalin.Context
+import io.javalin.core.util.Header
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.time.LocalDateTime
@@ -44,4 +46,11 @@ fun allEqual(vararg args: Any?, mayBeNull: Boolean = true): Boolean {
         if (!mayBeNull && reference == null) return false
         args.none { it != reference }
     }
+}
+
+fun Context.resultHTML(html: String) {
+    this.contentType("text/html")
+    this.header(Header.CACHE_CONTROL, "no-cache")
+    this.header(Header.PRAGMA, "no-cache")
+    this.result(html)
 }
