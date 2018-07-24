@@ -14,11 +14,12 @@ class Statistics {
     init {
         val midnight = LocalDate.now().plusDays(1).atStartOfDay()
         val delay = Duration.between(now(), midnight).toMillis()
+        val interval = TimeUnit.DAYS.toMillis(1)
 
         Executors.newScheduledThreadPool(1).scheduleWithFixedDelay({
             LOG.info("Daily game counter set to 0")
             gamesToday = 0
-        }, delay, 1, TimeUnit.DAYS)
+        }, delay, interval, TimeUnit.MILLISECONDS)
     }
 
     override fun toString() = "Statistics(gamesToday=$gamesToday, runningGames=$runningGames)"
