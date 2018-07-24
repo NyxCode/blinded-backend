@@ -8,13 +8,12 @@ import com.nyxcode.blinded.backend.Config
 import com.nyxcode.blinded.backend.game.*
 import com.nyxcode.blinded.backend.newGameID
 import com.nyxcode.blinded.backend.newPlayer
-import com.nyxcode.blinded.backend.randomString
 import java.util.*
 import kotlin.concurrent.schedule
 
 class CreateGameListener(private val games: Games, private val config: Config) : DataListener<CreateGame> {
     override fun onData(client: SocketIOClient, data: CreateGame, req: AckRequest) {
-        val player = randomString(config.playerKeyLen)
+        val player = newPlayer(config)
         val gameInfo = GameInfo(id = newGameID(config), player1 = player)
         games.register(Game(gameInfo))
         client.joinRoom(gameInfo.id)
@@ -108,8 +107,8 @@ class DoTurnListener(private val games: Games, private val server: SocketIOServe
 
     private fun doBotTurn(playerClient: SocketIOClient, game: Game) {
         check(game.info.player2 == Bot.ID)
-        val move = Bot(game).findBestMove()
-        game.board[move.x][move.y] = Bot.ID
+        val (moveX, moveY) = Bot(game).findBestMove()
+        game.board[moveX][moveY] = Bot.ID
         game.info.nextTurn = game.info.player1
         game.updateState()
 
@@ -117,7 +116,7 @@ class DoTurnListener(private val games: Games, private val server: SocketIOServe
             playerClient.sendEvent(GameCompleted.NAME, GameCompleted(game))
             games.unregister(game.id)
         } else {
-            playerClient.sendEvent(EnemyTurn.NAME, EnemyTurn(move.x, move.y))
+            playerClient.sendEvent(EnemyTurn.NAME, EnemyTurn(moveX, moveY))
         }
     }
 }

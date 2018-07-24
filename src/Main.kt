@@ -14,12 +14,11 @@ fun main(args: Array<String>) {
     val stats = Statistics()
     val timer = Timer()
     val socketIO = createSocketIO(config)
-    val games = Games(config, timer, socketIO, stats)
+    val games = Games(config, timer, stats)
     val server = createJavalin(config)
 
     server.init(config)
     socketIO.init(games, config, stats)
-
 }
 
 fun createSocketIO(config: Config) =

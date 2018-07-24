@@ -1,9 +1,9 @@
 package com.nyxcode.blinded.backend.game
 
 import com.nyxcode.blinded.backend.LOG
-import com.nyxcode.blinded.backend.now
 import java.time.Duration
 import java.time.LocalDate
+import java.time.LocalDateTime.now
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 

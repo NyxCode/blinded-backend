@@ -3,9 +3,6 @@ package com.nyxcode.blinded.backend.game
 import kotlin.math.max
 import kotlin.math.min
 
-data class Move(val x: Int, val y: Int)
-
-
 class Bot(game: Game) {
 
     init {
@@ -55,9 +52,9 @@ class Bot(game: Game) {
         }
     }
 
-    fun findBestMove(): Move {
+    fun findBestMove(): Pair<Int, Int> {
         var bestVal = -1000
-        var bestMove: Move? = null
+        var bestMove: Pair<Int, Int>? = null
 
         board.forEachCell { x, y, cell ->
             if (cell == null) {
@@ -65,7 +62,7 @@ class Bot(game: Game) {
                 val moveVal = minimax(0, false)
                 board[x][y] = null
                 if (moveVal > bestVal) {
-                    bestMove = Move(x, y)
+                    bestMove = Pair(x, y)
                     bestVal = moveVal
                 }
             }

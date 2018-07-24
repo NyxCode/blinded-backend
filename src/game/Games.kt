@@ -1,6 +1,5 @@
 package com.nyxcode.blinded.backend.game
 
-import com.corundumstudio.socketio.SocketIOServer
 import com.nyxcode.blinded.backend.Config
 import com.nyxcode.blinded.backend.LOG
 import java.time.Duration
@@ -10,7 +9,6 @@ import kotlin.concurrent.schedule
 
 class Games(cfg: Config,
             timer: Timer,
-            private val server: SocketIOServer,
             private val statistics: Statistics) {
 
     private val games = ConcurrentHashMap<String, Game>()
